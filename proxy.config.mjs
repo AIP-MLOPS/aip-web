@@ -1,32 +1,33 @@
-import * as fs from 'fs';
+import * as fs from "fs";
 
 const targets = [
- 'http://localhost:8008',     // 1
+  //  'http://localhost:8008',     // 1
+  "http://localhost:30008", // 1
 ];
 
 const PROXY_CONFIG = {
-  '^/version.json$': {
+  "^/version.json$": {
     bypass: (req, res, proxyOptions) => {
       let url;
-      if (req.url === '/version.json') {
-        url = 'src/version.json';
-      } else if (req.url === '/configuration.json') {
-        url = 'src/configuration.json';
-      } else if (req.url === '/onboarding.json') {
-        url = 'src/onboarding.json';
+      if (req.url === "/version.json") {
+        url = "src/version.json";
+      } else if (req.url === "/configuration.json") {
+        url = "src/configuration.json";
+      } else if (req.url === "/onboarding.json") {
+        url = "src/onboarding.json";
       } else {
-        return  req.url;
+        return req.url;
       }
 
       const ver = fs.readFileSync(url);
       res.writeHead(200, {
-        'Content-Length': ver.length,
-        'Content-Type': 'application/json'
+        "Content-Length": ver.length,
+        "Content-Type": "application/json",
       });
       res.end(ver);
       return true;
-    }
-  }
+    },
+  },
 };
 
 targets.forEach((target, i) => {
@@ -35,11 +36,11 @@ targets.forEach((target, i) => {
     target: target,
     secure: true,
     changeOrigin: true,
-    cookieDomainRewrite: 'localhost',
-    logLevel: 'debug',
+    cookieDomainRewrite: "localhost",
+    logLevel: "debug",
     pathRewrite: {
-      [`^${path}`]: ''
-    }
+      [`^${path}`]: "",
+    },
   };
 });
 
