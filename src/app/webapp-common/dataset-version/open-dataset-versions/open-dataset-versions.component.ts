@@ -76,7 +76,13 @@ export class OpenDatasetVersionsComponent extends ControllersComponent implement
   }
 
   override downloadTableAsCSV() {
-    this.table().table.downloadTableAsCSV(`ClearML ${this.selectedProject.id === '*'? 'All': this.selectedProject?.basename?.substring(0,60)} Datasets`);
+    this.table().table.downloadTableAsCSV(
+      `AI-Platform ${
+        this.selectedProject.id === "*"
+          ? "All"
+          : this.selectedProject?.basename?.substring(0, 60)
+      } Datasets`
+    );
   }
   override setupBreadcrumbsOptions() {
     this.sub.add(this.selectedProject$.pipe(

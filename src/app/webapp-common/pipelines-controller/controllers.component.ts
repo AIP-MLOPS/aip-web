@@ -107,7 +107,13 @@ export class ControllersComponent extends ExperimentsComponent implements OnInit
   }
 
   override downloadTableAsCSV() {
-    this.table().table.downloadTableAsCSV(`ClearML ${this.selectedProject.id === '*'? 'All': this.selectedProject?.basename?.substring(0,60)} Pipelines`);
+    this.table().table.downloadTableAsCSV(
+      `AI-Platform ${
+        this.selectedProject.id === "*"
+          ? "All"
+          : this.selectedProject?.basename?.substring(0, 60)
+      } Pipelines`
+    );
   }
   override setupBreadcrumbsOptions() {
     this.sub.add(this.selectedProject$.pipe(

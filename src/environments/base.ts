@@ -73,15 +73,16 @@ export const BASE_ENV = {
   production: true,
   apiBaseUrl: null,
   fileBaseUrl: null,
-  productName: 'clearml',
+  productName: "clearml",
   demo: false,
-  headerPrefix: 'X-Clearml',
+  headerPrefix: "X-Clearml",
   version: versionConf.version,
-  userKey: 'EYVQ385RW7Y2QQUH88CZ7DWIQ1WUHP',
-  userSecret: 'XhkH6a6ds9JBnM_MrahYyYdO-wS2bqFSm8gl-V0UZXH26Ydd6Eyi28TeBEoSr6Z3Bes',
-  companyID: 'd1bd92a3b039400cbafc60a7a5b1e52b',
-  loginNotice: '',
-  loginBanner: '',
+  userKey: "EYVQ385RW7Y2QQUH88CZ7DWIQ1WUHP",
+  userSecret:
+    "XhkH6a6ds9JBnM_MrahYyYdO-wS2bqFSm8gl-V0UZXH26Ydd6Eyi28TeBEoSr6Z3Bes",
+  companyID: "d1bd92a3b039400cbafc60a7a5b1e52b",
+  loginNotice: "",
+  loginBanner: "",
   autoLogin: false,
   whiteLabelLogo: null,
   whiteLabelLink: null,
@@ -89,24 +90,30 @@ export const BASE_ENV = {
   whiteLabelLoginSubtitle: null,
   whiteLabelSlogan: null,
   communityContext: {
-    background: 'app/webapp-common/assets/icons/human-polygon.svg'
+    background: "app/webapp-common/assets/icons/human-polygon.svg",
   },
   GTM_ID: null,
   hideUpdateNotice: false,
   showSurvey: false,
   accountAdministration: false,
   useFilesProxy: true,
-  legal: {TOULink: 'https://github.com/allegroai/clearml-server/blob/master/LICENSE'},
-  plotlyURL: 'app/webapp-common/assets/plotly-2.35.0.min.js',
-  slackLink: 'https://joinslack.clear.ml',
-  docsLink: 'https://clear.ml/docs',
-  supportEmail: 'support@clear.ml',
-  branding: {logo: 'assets/logo-white.svg?v=7', logoSmall: 'assets/small-logo-white.svg?=2'},
-  serverDownMessage: 'The ClearML server is currently unavailable.<BR>' +
-    'Please try to reload this page in a little while.<BR>' +
-    'If the problem persists, verify your network connection is working and check the ClearML server logs for possible errors',
-  platformYoutubeChannel: 'https://www.youtube.com/c/ClearML/featured',
-  newExperimentYouTubeVideoId: 's3k9ntmQmD4',
+  legal: {
+    TOULink: "https://github.com/allegroai/clearml-server/blob/master/LICENSE",
+  },
+  plotlyURL: "app/webapp-common/assets/plotly-2.35.0.min.js",
+  slackLink: "https://joinslack.clear.ml",
+  docsLink: "https://clear.ml/docs",
+  supportEmail: "support@clear.ml",
+  branding: {
+    logo: "assets/logo-white.svg?v=7",
+    logoSmall: "assets/small-logo-white.svg?=2",
+  },
+  serverDownMessage:
+    "The AI-Platform server is currently unavailable.<BR>" +
+    "Please try to reload this page in a little while.<BR>" +
+    "If the problem persists, verify your network connection is working and check the AI-Platform server logs for possible errors",
+  platformYoutubeChannel: "https://www.youtube.com/c/AI-Platform/featured",
+  newExperimentYouTubeVideoId: "s3k9ntmQmD4",
   displayTips: true,
 } as Environment;
 

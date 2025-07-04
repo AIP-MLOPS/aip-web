@@ -373,9 +373,12 @@ export class ServingEffects {
               const actions = [deactivateLoader(action.type)] as Action[];
               if (endpoint) {
                 actions.push(ServingActions.setServingEndpointDetails({endpoint}));
-                actions.push(ServingActions.getModelsSourceLinks({
-                  instances: endpoint.instances,
-                  insideModel: endpoint.model_source === 'ClearML'}));
+                actions.push(
+                  ServingActions.getModelsSourceLinks({
+                    instances: endpoint.instances,
+                    insideModel: endpoint.model_source === "AI-Platform",
+                  })
+                );
               }
               return actions;
             }),

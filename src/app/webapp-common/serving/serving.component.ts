@@ -316,7 +316,7 @@ export class ServingComponent extends BaseEntityPageComponent implements OnInit,
   }
 
   downloadTableAsCSV() {
-    this.table.table.downloadTableAsCSV(`ClearML All Endpoints`);
+    this.table.table.downloadTableAsCSV(`AI-Platform All Endpoints`);
   }
 
   override onFooterHandler(): void {

@@ -21,17 +21,16 @@ export class UsageStatsService {
       this.store.select(selectPromptUser)
         .pipe(filter(prompt => !!prompt))
         .subscribe(() => {
-          const dialogRef = this.dialog.open(ConfirmDialogComponent,
-            {
-              data: {
-                title: 'Help us improve ClearML',
-                body: `Please allow the ClearML server to send anonymous usage metrics so we can better understand how ClearML is being used and make it even better.<BR>
+          const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+              title: "Help us improve AI-Platform",
+              body: `Please allow the AI-Platform server to send anonymous usage metrics so we can better understand how AI-Platform is being used and make it even better.<BR>
   This setting can be changed through the Profile page.`,
-                yes: 'Approve',
-                no: 'Deny',
-                iconClass: 'i-terms',
-              }
-            });
+              yes: "Approve",
+              no: "Deny",
+              iconClass: "i-terms",
+            },
+          });
 
           dialogRef.afterClosed().subscribe((allowed: boolean) => {
             this.store.dispatch(updateUsageStats({allowed}));

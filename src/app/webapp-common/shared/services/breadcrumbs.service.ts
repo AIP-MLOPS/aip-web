@@ -15,7 +15,7 @@ import {Title} from '@angular/platform-browser';
 import {ConfigurationService} from '@common/shared/services/configuration.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class BreadcrumbsService {
   private store = inject(Store);
@@ -23,82 +23,122 @@ export class BreadcrumbsService {
   public route = inject(ActivatedRoute);
   private titleService = inject(Title);
   private config = inject(ConfigurationService);
-  protected staticBreadcrumb = signal(null)
-  private title = computed(() => this.config.configuration().branding?.faviconUrl ? '' : 'ClearML');
-  private titlePrefix = computed(() => this.title() ? this.title() + ' - ' : '')
+  protected staticBreadcrumb = signal(null);
+  private title = computed(() =>
+    this.config.configuration().branding?.faviconUrl ? "" : "AI-Platform"
+  );
+  private titlePrefix = computed(() =>
+    this.title() ? this.title() + " - " : ""
+  );
 
   constructor() {
     this.titleService.setTitle(this.title());
-    this.store.select(selectBreadcrumbs)
+    this.store
+      .select(selectBreadcrumbs)
       .pipe(takeUntilDestroyed())
-      .subscribe(breadcrumbs => {
-        const crumbs = breadcrumbs.flat().filter((breadcrumb => !!breadcrumb?.name)).map(breadcrumb => breadcrumb.name);
-        if(crumbs.length > 0) {
-          this.titleService.setTitle(`${this.titlePrefix()}${crumbs.join(' / ')}`);
+      .subscribe((breadcrumbs) => {
+        const crumbs = breadcrumbs
+          .flat()
+          .filter((breadcrumb) => !!breadcrumb?.name)
+          .map((breadcrumb) => breadcrumb.name);
+        if (crumbs.length > 0) {
+          this.titleService.setTitle(
+            `${this.titlePrefix()}${crumbs.join(" / ")}`
+          );
         }
       });
 
     combineLatest([
       this.store.select(selectHasProjectId).pipe(startWith(false)),
-      this.router.events.pipe(filter((event) => event instanceof NavigationEnd))
+      this.router.events.pipe(
+        filter((event) => event instanceof NavigationEnd)
+      ),
     ])
       .pipe(takeUntilDestroyed())
       .subscribe(([hasProjectId]) => {
         this.setCrumbs(hasProjectId);
       });
 
-
-    this.store.select(selectFeatureParam)
-      .pipe(
-        takeUntilDestroyed(),
-        distinctUntilChanged()
-      )
+    this.store
+      .select(selectFeatureParam)
+      .pipe(takeUntilDestroyed(), distinctUntilChanged())
       .subscribe(() => {
-          this.store.dispatch(setBreadcrumbsOptions({breadcrumbOptions: null}));
-        }
-      );
+        this.store.dispatch(setBreadcrumbsOptions({ breadcrumbOptions: null }));
+      });
 
     combineLatest([
       this.store.select(selectProjectAncestors),
-      this.store.select(selectBreadcrumbOptions)
+      this.store.select(selectBreadcrumbOptions),
     ])
       .pipe(
         takeUntilDestroyed(),
         debounceTime(200),
-        filter(([projectAncestors, breadcrumbOptions]) => !!breadcrumbOptions && (!breadcrumbOptions.showProjects || projectAncestors !== null)),
+        filter(
+          ([projectAncestors, breadcrumbOptions]) =>
+            !!breadcrumbOptions &&
+            (!breadcrumbOptions.showProjects || projectAncestors !== null)
+        )
       )
       .subscribe(([projectAncestors, breadcrumbOptions]) => {
-        const crumbAfterProject = breadcrumbOptions.subFeatureBreadcrumb &&
-          (!breadcrumbOptions.subFeatureBreadcrumb.onlyWithProject || projectAncestors?.length > 0);
-        const projectCrumb = breadcrumbOptions.projectsOptions?.selectedProjectBreadcrumb;
-        this.store.dispatch(setBreadcrumbs({
-          breadcrumbs: [
-            [breadcrumbOptions.featureBreadcrumb],
-            ...([projectAncestors
-              ?.filter(ancestor =>
-                !breadcrumbOptions.projectsOptions.filterBaseNameWith ||
-                !breadcrumbOptions.projectsOptions.filterBaseNameWith.includes(ancestor.basename)
-              )
-              .map(ancestor => ({
-                name: ancestor.basename,
-                example: isExample(ancestor),
-                url: `${breadcrumbOptions.projectsOptions.basePath}/${ancestor.id}/projects`,
-                type: CrumbTypeEnum.Project,
-                hidden: ancestor.hidden,
-                collapsable: true
-              } as IBreadcrumbsLink))
-              .concat(projectCrumb?.url && crumbAfterProject ?
-                [{...projectCrumb, type: CrumbTypeEnum.Project, collapsable: true} as IBreadcrumbsLink] : []
-              )
-            ]),
-            ...(projectCrumb && !(projectCrumb.url && projectAncestors && crumbAfterProject) ?
-                [[breadcrumbOptions.projectsOptions.selectedProjectBreadcrumb]] : []
-            ),
-            ...(breadcrumbOptions.subFeatureBreadcrumb && (!breadcrumbOptions.subFeatureBreadcrumb.onlyWithProject || projectAncestors?.length > 0) ?
-                [[breadcrumbOptions.subFeatureBreadcrumb]] : []
-            ),
-          ]
-        }));
+        const crumbAfterProject =
+          breadcrumbOptions.subFeatureBreadcrumb &&
+          (!breadcrumbOptions.subFeatureBreadcrumb.onlyWithProject ||
+            projectAncestors?.length > 0);
+        const projectCrumb =
+          breadcrumbOptions.projectsOptions?.selectedProjectBreadcrumb;
+        this.store.dispatch(
+          setBreadcrumbs({
+            breadcrumbs: [
+              [breadcrumbOptions.featureBreadcrumb],
+              ...[
+                projectAncestors
+                  ?.filter(
+                    (ancestor) =>
+                      !breadcrumbOptions.projectsOptions.filterBaseNameWith ||
+                      !breadcrumbOptions.projectsOptions.filterBaseNameWith.includes(
+                        ancestor.basename
+                      )
+                  )
+                  .map(
+                    (ancestor) =>
+                      ({
+                        name: ancestor.basename,
+                        example: isExample(ancestor),
+                        url: `${breadcrumbOptions.projectsOptions.basePath}/${ancestor.id}/projects`,
+                        type: CrumbTypeEnum.Project,
+                        hidden: ancestor.hidden,
+                        collapsable: true,
+                      } as IBreadcrumbsLink)
+                  )
+                  .concat(
+                    projectCrumb?.url && crumbAfterProject
+                      ? [
+                          {
+                            ...projectCrumb,
+                            type: CrumbTypeEnum.Project,
+                            collapsable: true,
+                          } as IBreadcrumbsLink,
+                        ]
+                      : []
+                  ),
+              ],
+              ...(projectCrumb &&
+              !(projectCrumb.url && projectAncestors && crumbAfterProject)
+                ? [
+                    [
+                      breadcrumbOptions.projectsOptions
+                        .selectedProjectBreadcrumb,
+                    ],
+                  ]
+                : []),
+              ...(breadcrumbOptions.subFeatureBreadcrumb &&
+              (!breadcrumbOptions.subFeatureBreadcrumb.onlyWithProject ||
+                projectAncestors?.length > 0)
+                ? [[breadcrumbOptions.subFeatureBreadcrumb]]
+                : []),
+            ],
+          })
+        );
       });
   }
 
@@ -113,9 +153,14 @@ export class BreadcrumbsService {
     }
     const staticBreadcrumb = route?.data?.staticBreadcrumb;
     if (!hasProjectId && staticBreadcrumb) {
-      this.store.dispatch(setBreadcrumbs({breadcrumbs: staticBreadcrumb, workspaceNeutral: neutral}));
+      this.store.dispatch(
+        setBreadcrumbs({
+          breadcrumbs: staticBreadcrumb,
+          workspaceNeutral: neutral,
+        })
+      );
     } else {
-      this.store.dispatch(setWorkspaceNeutral({neutral}));
+      this.store.dispatch(setWorkspaceNeutral({ neutral }));
     }
   }
 }

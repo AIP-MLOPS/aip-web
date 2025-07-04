@@ -508,7 +508,13 @@ export class ModelsComponent extends BaseEntityPageComponent implements OnInit, 
   }
 
   downloadTableAsCSV() {
-    this.table.table.downloadTableAsCSV(`ClearML ${this.selectedProject.id === '*'? 'All': this.selectedProject?.basename?.substring(0, 60)} Models`);
+    this.table.table.downloadTableAsCSV(
+      `AI-Platform ${
+        this.selectedProject.id === "*"
+          ? "All"
+          : this.selectedProject?.basename?.substring(0, 60)
+      } Models`
+    );
   }
 
   downloadFullTableAsCSV() {

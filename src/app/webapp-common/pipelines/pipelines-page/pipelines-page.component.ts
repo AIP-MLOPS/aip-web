@@ -33,12 +33,15 @@ import {debounceTime, skip, withLatestFrom} from 'rxjs/operators';
 import {ProjectTypeEnum} from '@common/nested-project-view/nested-project-view-page/nested-project-view-page.component';
 
 @Component({
-    selector: 'sm-pipelines-page',
-    templateUrl: './pipelines-page.component.html',
-    styleUrls: ['./pipelines-page.component.scss'],
-    standalone: false
+  selector: "sm-pipelines-page",
+  templateUrl: "./pipelines-page.component.html",
+  styleUrls: ["./pipelines-page.component.scss"],
+  standalone: false,
 })
-export class PipelinesPageComponent extends CommonProjectsPageComponent implements OnInit, OnDestroy {
+export class PipelinesPageComponent
+  extends CommonProjectsPageComponent
+  implements OnInit, OnDestroy
+{
   initPipelineCode = `from clearml import PipelineDecorator
 
 @PipelineDecorator.component(cache=True, execution_queue="default")
@@ -58,7 +61,7 @@ def pipeline_logic(do_stuff: bool):
 if __name__ == '__main__':
     # run the pipeline on the current machine, for local debugging
     # for scale-out, comment-out the following line (Make sure a
-    # 'services' queue is available and serviced by a ClearML agent
+    # 'services' queue is available and serviced by a AI-Platform agent
     # running either in services mode or through K8S/Autoscaler)
     PipelineDecorator.run_locally()
 
@@ -75,36 +78,36 @@ if __name__ == '__main__':
 
   override ngOnInit() {
     super.ngOnInit();
-    this.store.dispatch(getProjectsTags({entity: this.getName()}));
+    this.store.dispatch(getProjectsTags({ entity: this.getName() }));
     this.showExamples$ = this.store.select(selectShowPipelineExamples);
     this.projectsTags$ = this.store.select(selectProjectTags);
     this.mainPageFilterSub = combineLatest([
       this.store.select(selectMainPageTagsFilter),
-      this.store.select(selectMainPageTagsFilterMatchMode)
-    ]).pipe(debounceTime(0), skip(1))
+      this.store.select(selectMainPageTagsFilterMatchMode),
+    ])
+      .pipe(debounceTime(0), skip(1))
       .subscribe(() => {
         this.store.dispatch(resetProjects());
         this.store.dispatch(getAllProjectsPageProjects());
       });
-
   }
 
   override ngOnDestroy() {
     super.ngOnDestroy();
     this.headerUserFocusSub?.unsubscribe();
     this.mainPageFilterSub.unsubscribe();
-    this.store.dispatch(setTags({tags: []}));
+    this.store.dispatch(setTags({ tags: [] }));
   }
 
   addTag(project: Project, newTag: string) {
     const tags = [...project.tags, newTag];
-    this.store.dispatch(updateProject({id: project.id, changes: {tags}}));
-    this.store.dispatch(addProjectTags({tags: [newTag], systemTags: []}));
+    this.store.dispatch(updateProject({ id: project.id, changes: { tags } }));
+    this.store.dispatch(addProjectTags({ tags: [newTag], systemTags: [] }));
   }
 
   removeTag(project: Project, deleteTag: string) {
-    const tags = project.tags?.filter(tag => tag != deleteTag);
-    this.store.dispatch(updateProject({id: project.id, changes: {tags}}));
+    const tags = project.tags?.filter((tag) => tag != deleteTag);
+    this.store.dispatch(updateProject({ id: project.id, changes: { tags } }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -113,8 +116,15 @@ if __name__ == '__main__':
   }
 
   public override projectCardClicked(project: ProjectsGetAllResponseSingle) {
-    this.router.navigate([project.id, 'tasks'], {relativeTo: this.projectId ? this.route.parent.parent.parent : this.route});
-    this.store.dispatch(setSelectedProjectId({projectId: project.id, example: isExample(project)}));
+    this.router.navigate([project.id, "tasks"], {
+      relativeTo: this.projectId ? this.route.parent.parent.parent : this.route,
+    });
+    this.store.dispatch(
+      setSelectedProjectId({
+        projectId: project.id,
+        example: isExample(project),
+      })
+    );
   }
 
   protected override getName() {
@@ -122,17 +132,16 @@ if __name__ == '__main__':
   }
 
   protected override getDeletePopupEntitiesList() {
-    return 'run';
+    return "run";
   }
 
   createPipeline() {
     this.dialog.open(PipelinesEmptyStateComponent, {
       data: {
-        pipelineCode: this.initPipelineCode
+        pipelineCode: this.initPipelineCode,
       },
-      width: '1248px'
+      width: "1248px",
     });
-
   }
 
   createExamples() {
@@ -140,44 +149,69 @@ if __name__ == '__main__':
   }
 
   override shouldReRoute(selectedProject, config) {
-    const relevantSubProjects = selectedProject?.sub_projects?.filter(proj => proj.name.includes('.pipelines'));
-    return config[2] === 'projects' && selectedProject.id !== '*' && (relevantSubProjects?.every(subProject => subProject.name.startsWith(selectedProject.name + '/.')));
+    const relevantSubProjects = selectedProject?.sub_projects?.filter((proj) =>
+      proj.name.includes(".pipelines")
+    );
+    return (
+      config[2] === "projects" &&
+      selectedProject.id !== "*" &&
+      relevantSubProjects?.every((subProject) =>
+        subProject.name.startsWith(selectedProject.name + "/.")
+      )
+    );
   }
 
   override noProjectsReRoute() {
-    return this.router.navigate(['..', 'pipelines'], {relativeTo: this.route});
+    return this.router.navigate(["..", "pipelines"], {
+      relativeTo: this.route,
+    });
   }
 
   toggleNestedView(nested: boolean) {
-    this.store.dispatch(setDefaultNestedModeForFeature({feature: 'pipelines', isNested: nested}));
+    this.store.dispatch(
+      setDefaultNestedModeForFeature({ feature: "pipelines", isNested: nested })
+    );
 
     if (nested) {
-      this.router.navigate(['*', 'projects'], {relativeTo: this.route});
+      this.router.navigate(["*", "projects"], { relativeTo: this.route });
     } else {
-      this.router.navigateByUrl('pipelines');
+      this.router.navigateByUrl("pipelines");
     }
   }
 
   override setupBreadcrumbsOptions() {
-    this.subs.add(this.selectedProject$.pipe(
-      withLatestFrom(this.store.select(selectDefaultNestedModeForFeature))
-    ).subscribe(([selectedProject, defaultNestedModeForFeature]) => {
-      this.store.dispatch(setBreadcrumbsOptions({
-        breadcrumbOptions: {
-          showProjects: !!selectedProject,
-          featureBreadcrumb: {
-            name: 'PIPELINES',
-            url: defaultNestedModeForFeature['pipelines'] ? 'pipelines/*/projects' : 'pipelines'
-          },
-          projectsOptions: {
-            basePath: 'pipelines',
-            filterBaseNameWith: ['.pipelines'],
-            compareModule: null,
-            showSelectedProject: selectedProject?.id !== '*',
-            ...(selectedProject && selectedProject?.id !== '*' && {selectedProjectBreadcrumb: {name: selectedProject?.basename}})
-          }
-        }
-      }));
-    }));
+    this.subs.add(
+      this.selectedProject$
+        .pipe(
+          withLatestFrom(this.store.select(selectDefaultNestedModeForFeature))
+        )
+        .subscribe(([selectedProject, defaultNestedModeForFeature]) => {
+          this.store.dispatch(
+            setBreadcrumbsOptions({
+              breadcrumbOptions: {
+                showProjects: !!selectedProject,
+                featureBreadcrumb: {
+                  name: "PIPELINES",
+                  url: defaultNestedModeForFeature["pipelines"]
+                    ? "pipelines/*/projects"
+                    : "pipelines",
+                },
+                projectsOptions: {
+                  basePath: "pipelines",
+                  filterBaseNameWith: [".pipelines"],
+                  compareModule: null,
+                  showSelectedProject: selectedProject?.id !== "*",
+                  ...(selectedProject &&
+                    selectedProject?.id !== "*" && {
+                      selectedProjectBreadcrumb: {
+                        name: selectedProject?.basename,
+                      },
+                    }),
+                },
+              },
+            })
+          );
+        })
+    );
   }
 }
